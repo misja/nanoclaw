@@ -193,7 +193,8 @@ export class WhatsAppChannel implements Channel {
         // Only deliver full message for registered groups
         const groups = this.opts.registeredGroups();
         if (groups[chatJid]) {
-          const normalized = normalizeMessageContent(msg.message) || msg.message;
+          const normalized =
+            normalizeMessageContent(msg.message) || msg.message;
           let content =
             normalized.conversation ||
             normalized.extendedTextMessage?.text ||
