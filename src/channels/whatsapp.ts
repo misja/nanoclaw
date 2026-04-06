@@ -33,6 +33,15 @@ import { registerChannel, ChannelOpts } from './registry.js';
 
 const GROUP_SYNC_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
+// Baileys requires ILogger with level/child/trace — wrap our logger
+const baileysLogger = {
+  ...logger,
+  level: 'silent',
+  trace: (dataOrMsg: Record<string, unknown> | string, msg?: string) =>
+    logger.debug(dataOrMsg as Record<string, unknown>, msg),
+  child: () => baileysLogger,
+};
+
 export interface WhatsAppChannelOpts {
   onMessage: OnInboundMessage;
   onChatMetadata: OnChatMetadata;
@@ -78,10 +87,10 @@ export class WhatsAppChannel implements Channel {
       version,
       auth: {
         creds: state.creds,
-        keys: makeCacheableSignalKeyStore(state.keys, logger),
+        keys: makeCacheableSignalKeyStore(state.keys, baileysLogger),
       },
       printQRInTerminal: false,
-      logger,
+      logger: baileysLogger,
       browser: Browsers.macOS('Chrome'),
     });
 
